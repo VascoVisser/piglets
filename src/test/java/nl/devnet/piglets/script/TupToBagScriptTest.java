@@ -13,6 +13,7 @@ import org.apache.pig.pigunit.pig.PigServer;
 import org.apache.pig.tools.parameters.ParseException;
 import org.junit.Test;
 
+
 public class TupToBagScriptTest {
 
 	@Test
