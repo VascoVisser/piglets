@@ -3,7 +3,7 @@ package nl.devnet.piglets.script;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.List;
 
 import org.apache.pig.ExecType;
 import org.apache.pig.data.Tuple;
@@ -12,6 +12,9 @@ import org.apache.pig.pigunit.PigTest;
 import org.apache.pig.pigunit.pig.PigServer;
 import org.apache.pig.tools.parameters.ParseException;
 import org.junit.Test;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 
 public class TupToBagScriptTest {
@@ -24,16 +27,25 @@ public class TupToBagScriptTest {
 		PigTest test = new PigTest("src/test/pig/tup_to_bag.pig", null,
 				pigServer, pigCluster);
 
-		String[] input = { "1	(2,3)", };
+		String[] input = { "1	(2,3)", 
+				"2	2",
+				"3	(,,)"};
 		final String destination = "TupToBagTest.txt";
 		PigTest.getCluster().copyFromLocalFile(input, destination, true);
 
 		test.override("A",
 				String.format("A = LOAD '%s' AS (f1:int, f2:());", destination));
 
-		Iterator<Tuple> out = test.getAlias("out");
+		List<Tuple> out = Lists.newArrayList(test.getAlias("out"));
 
-		assertEquals("Record 1", "(1,2)", out.next().toString());
-		assertEquals("Record 2", "(1,3)", out.next().toString());
+		System.out.println(Joiner.on("\n").join(out));
+		
+		int i = 0;
+		assertEquals("Record 1", "(1,2)", out.get(i++).toString());
+		assertEquals("Record 2", "(1,3)", out.get(i++).toString());
+		assertEquals("Record 3", "(2,)", out.get(i++).toString());
+		assertEquals("Record 4", "(3,)", out.get(i++).toString());
+		assertEquals("Record 5", "(3,)", out.get(i++).toString());
+		assertEquals("Record 6", "(3,)", out.get(i++).toString());
 	}
 }
